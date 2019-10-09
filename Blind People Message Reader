@@ -1,0 +1,253 @@
+% fclose(modem);
+%delete(modem);
+clc;
+clear all;
+%initialising Serial Port and Voice
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ha = actxserver('SAPI.SpVoice');
+
+text1= 'Please wait ... the system is initializing';
+disp(text1);
+invoke(ha,'speak',text1);
+
+modem = serial('COM3');
+set(modem,'BaudRate',9600);
+set(modem,'DataBits',8);
+set(modem,'Parity','none');
+set(modem,'StopBits',1);
+set(modem,'FlowControl','none');
+fopen(modem);
+text2= 'Initializing is over..';
+disp(text2);
+invoke(ha,'speak',text2);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%initialising GSM Modem
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+text3= 'Initializing GSM Modem now';
+disp(text3);
+invoke(ha,'speak',text3);
+
+testcondition = 0;
+while testcondition==0   %continue this loop till gsm is responding with AT Commands
+    
+    fprintf(modem,'%s\r\n','at');
+    pause(10);
+    received = fgetl(modem)
+    
+    
+    
+    for i=1:length(received)
+        if (received(1,i)=='O')
+            if (received(1,(i+1))=='K')
+                testcondition = 1
+                break;
+            end
+        end
+        
+    end
+    if(testcondition == 1)
+        disp('GSM is responding with AT command....');
+        invoke(ha,'speak','GSM is responding with AT command....');
+    else
+        disp('GSM is not responding with AT command....');
+        invoke(ha,'speak','GSM is not noresponding with AT command....');
+        
+    end
+    pause(1);
+    
+end
+testcondition = 0
+while 0== testcondition
+    fprintf(modem,'%s\r\n','ate0');
+    pause(1);
+    received = fgetl(modem)
+    
+    
+    
+    for i=1:length(received)
+        if (received(1,i)=='O')
+            if (received(1,(i+1))=='K')
+                testcondition = 1
+                break;
+            end
+        end
+        
+    end
+    
+    if(1 == testcondition )
+        disp('echoing is made off');
+        invoke(ha,'speak','echoing is made off');
+    else
+        disp('echoing is not made off');
+        invoke(ha,'speak','echoing is not made off');
+        
+    end
+    pause(1);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+testcondition = 0
+while 0== testcondition
+    fprintf(modem,'%s\r\n','AT&W');
+    pause(1);
+    received = fgetl(modem)
+    
+    
+    
+    for i=1:length(received)
+        if (received(1,i)=='O')
+            if (received(1,(i+1))=='K')
+                testcondition = 1
+                break;
+            end
+        end
+        
+    end
+    
+    if(1 == testcondition )
+        disp('AT&W OK');
+        invoke(ha,'speak','AT&W OK');
+    else
+        disp('AT&W NOT OK');
+        invoke(ha,'speak','AT&W NOT OK');
+        
+    end
+    pause(1);
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+testcondition = 0
+while 0== testcondition
+    fprintf(modem,'%s\r\n','AT+CMGF=1');
+    pause(1);
+    received = fgetl(modem)
+    
+    
+    
+    for i=1:length(received)
+        if (received(1,i)=='O')
+            if (received(1,(i+1))=='K')
+                testcondition = 1
+                break;
+            end
+        end
+        
+    end
+    
+    if(1 == testcondition )
+        disp('Message Format is SET');
+        invoke(ha,'speak','Message Format is SET');
+    else
+           
+        disp(' Message Format is NOT SET');
+        invoke(ha,'speak',' Message Format is NOT SET');
+        
+    end
+    pause(1);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+testcondition = 0
+while 0== testcondition
+    fprintf(modem,'%s\r\n','AT+CNMI=2,2,0,0,0');
+    pause(1);
+    received = fgetl(modem)
+    
+    
+    
+    for i=1:length(received)
+        if (received(1,i)=='O')
+            if (received(1,(i+1))=='K')
+                testcondition = 1
+                break;
+            end
+        end
+        
+    end
+    
+    if(1 == testcondition )
+        disp('Incoming Message Format is SET');
+        invoke(ha,'speak','Incoming Message Format is SET');
+    else
+        disp('Incoming Message Format is NOT SET');
+        invoke(ha,'speak','Incoming Message Format is NOT SET');
+        
+    end
+    pause(1);
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+text4 = 'Initializing GSM Modem is over';
+disp(text4);
+invoke(ha,'speak',text4);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+modem.TimeOut = 100;
+
+    received = fgetl(modem)
+    received = fgetl(modem)
+    received = fgetl(modem)
+    received = fgetl(modem)
+    received = fgetl(modem)
+
+invoke(ha,'speak','Send messages now to test this module:');
+
+
+while 1
+    readingover = 0;
+    received = fgetl(modem)
+    
+     i=1;
+     validity = size(received);
+     if(validity)
+        if (received(1,i)=='+')
+            if (received(1,(i+1))=='C')
+                if(received(1,(i+2))=='M')
+                     if(received(1,(i+3))=='T')
+invoke(ha,'speak','You got a message from ');
+                                pause(1);
+                                for j=i+10:i+19
+                                    invoke(ha,'speak',received(1,j));
+                            
+                                                                        
+                                end
+                                 pause(1);
+                                 invoke(ha,'speak','Here is your message:');
+                                 pause(1);
+                                 
+                                 received = fgetl(modem)
+                                   validity1 = size(received);
+                                    if(validity1)
+
+                                          invoke(ha,'speak',received);
+                                   % else
+                                       %  invoke(ha,'speak','Empty');
+
+                                    end
+                                 readingover = 1; 
+                                 
+                                  end  
+                                  
+                     end
+            end
+          end
+       
+    if (0 == readingover) 
+    invoke(ha,'speak',received);
+    end
+     end
+
+    end
+
+

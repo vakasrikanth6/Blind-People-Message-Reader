@@ -1,0 +1,58 @@
+ARDUINO PROGRAM FOR DTMF: 
+#define IRQ 2 
+#define d0 3 
+#define d1 4 
+#define d2 5 
+#define d3 6 
+byte k; 
+void setup() 
+{ 
+Serial.begin(9600); 
+pinMode(IRQ, INPUT); 
+pinMode(d0, INPUT); 
+pinMode(d1, INPUT); 
+pinMode(d2, INPUT); 
+pinMode(d3, INPUT); 
+} 
+void loop() 
+{ 
+k = digitalRead(IRQ); 
+if ( k == 1 ){ 
+Serial.print("Key : "); 
+char key = read_cod(); 
+Serial.println(key); 
+delay(80); 
+} 
+} 
+byte read_cod() 
+{ 
+byte data; 
+char key; 
+byte D0,D1,D2,D3; 
+D0 = digitalRead(d0); 
+D1 = digitalRead(d1); 
+D2 = digitalRead(d2); 
+D3 = digitalRead(d3); 
+bitWrite(data,0,D0); 
+bitWrite(data,1,D1); 
+bitWrite(data,2,D2); 
+bitWrite(data,3,D3); 
+if ( data == 1 ) key = '1'; 
+if ( data == 2 ) key = '2'; 
+if ( data == 3 ) key = '3'; 
+if ( data == 4 ) key = '4'; 
+if ( data == 5 ) key = '5'; 
+if ( data == 6 ) key = '6'; 
+if ( data == 7 ) key = '7'; 
+if ( data == 8 ) key = '8'; 
+if ( data == 9 ) key = '9'; 
+if ( data == 10 ) key = '0'; 
+if ( data == 11 ) key = '*'; 
+if ( data == 12 ) key = '#'; 
+if ( data == 13 ) key = 'A'; 
+if ( data == 14 ) key = 'B'; 
+if ( data == 15 ) key = 'C'; 
+if ( data == 16 ) key = 'D'; 
+return key; 
+} 
+
